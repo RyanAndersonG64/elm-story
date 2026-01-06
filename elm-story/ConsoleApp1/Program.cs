@@ -1,4 +1,6 @@
-﻿abstract class Character
+﻿// Characters
+
+abstract class Character
 {
     public string Name { get; protected set; }
     public int MaxHealth { get; protected set; }
@@ -23,24 +25,40 @@
     {
         CurrentHealth -= amount;
     }
+
+    public void Heal(int amount)
+    {
+        CurrentHealth += amount;
+        if (CurrentHealth > MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+        }
+    }
 }
+
+
+////////////////////////////////////////
+//     Player Characters
+////////////////////////////////////////
 
 abstract class PlayerCharacter : Character
 {
-    public string Class { get; protected set; }
+    public string Job { get; protected set; }
     public int Strength { get; protected set; }
     public int Dexterity { get; protected set; }
     public int Intelligence { get; protected set; }
     public int Luck { get; protected set; }
+    public Inventory Bag { get; protected set; }
 
-    protected PlayerCharacter(string ClassType, string CharacterName, int health, int mana, int WD, int MD, int strength, int dexterity, int intelligence, int luck)
+    public PlayerCharacter(string ClassType, string CharacterName, int health, int mana, int WD, int MD, int strength, int dexterity, int intelligence, int luck)
         : base(CharacterName, health, mana, WD, MD)
     {
-        Class = ClassType;
+        Job = ClassType;
         Strength = strength;
         Dexterity = dexterity;
         Intelligence = intelligence;
         Luck = luck;
+        Bag = new Inventory();
     }
 
 }
@@ -78,6 +96,9 @@ class Rogue : PlayerCharacter
 
 
 
+////////////////////////////////////////
+//     Enemies
+////////////////////////////////////////
 
 abstract class EnemyCharacter : Character
 {
@@ -102,8 +123,228 @@ class Slime : EnemyCharacter
 
 
 
+////////////////////////////////////////
+//     Items and Inventory
+////////////////////////////////////////
+
+abstract class Item
+{
+    public string Name { get; protected set; }
+    public bool UsableInCombat;
+    public bool UsableInOverworld;
+
+    protected Item(string name, bool usableInCombat, bool usableInOverworld)
+    {
+        Name = name;
+        UsableInCombat = usableInCombat;
+        UsableInOverworld = usableInOverworld;
+    }
+
+    public abstract bool Use(PlayerCharacter player);
+}
+
+class ItemStack
+{
+    public Item Item { get; }
+    public int Count { get; private set; }
+
+    public ItemStack(Item item, int count)
+    {
+        Item = item;
+        Count = count;
+    }
+
+    public void Add(int amount)
+    {
+        Count += amount;
+    }
+
+    public void Subtract(int amount)
+    {
+        Count -= amount;
+    }
+}
+
+class Inventory
+{
+    List<ItemStack> items = new List<ItemStack>();
+
+    public void Add(Item item, int amount)
+    {
+        var stack = items.FirstOrDefault(s => s.Item.GetType() == item.GetType());
+
+        if (stack != null)
+        {
+            stack.Add(amount);
+        }
+        else
+        {
+            items.Add(new ItemStack(item, amount));
+        }
+    }
+
+    public void Subtract(Item item, int amount)
+    {
+        var stack = items.FirstOrDefault(s => s.Item.GetType() == item.GetType());
+
+        stack.Subtract(amount);
+        if (stack.Count <= 0)
+        {
+            items.Remove(stack);
+        }
+
+    }
+
+    public void UseItem(int index, PlayerCharacter player)
+    {
+        if (index < 0 || index >= items.Count)
+            return;
+
+        var stack = items[index];
+
+        bool used = stack.Item.Use(player);
+
+        if (used)
+        {
+            stack.Subtract(1);
+
+            if (stack.Count <= 0)
+                items.RemoveAt(index);
+        }
+    }
 
 
+    public bool DisplayBagInCombat(PlayerCharacter player)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Inventory:");
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            if (items[i].Item.UsableInCombat)
+            {
+                Console.WriteLine($"{i + 1} - {items[i].Count} {items[i].Item.Name}");
+            }
+        }
+
+        Console.WriteLine($"{items.Count + 1} - Cancel");
+        Console.WriteLine();
+
+        string ItemChoice = Console.ReadLine();
+        int choice;
+        bool ParsedChoice = int.TryParse(ItemChoice, out choice);
+
+        if (choice == items.Count + 1)
+        {
+            return false;
+        }
+        else if (choice > 0 && choice < items.Count + 1)
+        {
+            UseItem(choice - 1, player);
+            return true;
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice");
+            return false;
+        }
+    }
+
+    public bool DisplayBagInOverworld(PlayerCharacter player)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Inventory:");
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            Console.WriteLine($"{i + 1} - {items[i].Count} {items[i].Item}");
+        }
+
+        Console.WriteLine($"{items.Count + 1} - Cancel");
+        Console.WriteLine();
+
+        string ItemChoice = Console.ReadLine();
+        int choice;
+        bool ParsedChoice = int.TryParse(ItemChoice, out choice);
+
+        if (choice == items.Count + 1)
+        {
+            return false;
+        }
+        else if (choice > 0 && choice < items.Count + 1)
+        {
+            if (items[choice - 1].Item.UsableInOverworld)
+            {
+                UseItem(choice - 1, player);
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"Oak, {player.Name}. This isn't the time to use that!");
+                return false;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice");
+            return false;
+        }
+
+
+
+    }
+
+}
+
+
+// Potions
+
+abstract class HealthPotion : Item
+{
+    public int HealthRestored;
+    public override bool Use(PlayerCharacter player)
+    {
+        player.Heal(HealthRestored);
+        return true;
+    }
+
+    protected HealthPotion(string Item, bool UsableInCombat, bool UsableInOverworld, int HealValue)
+        : base(Item, UsableInCombat, UsableInOverworld)
+    {
+        HealthRestored = HealValue;
+    }
+}
+
+class BasicHealthPotion : HealthPotion
+{
+    public BasicHealthPotion()
+        : base("Basic Health Potion", true, true, 50) { }
+}
+
+class StandardHealthPotion : HealthPotion
+{
+    public StandardHealthPotion()
+        : base("Standard Health Potion", true, true, 100) { }
+}
+
+class StrongHealthPotion : HealthPotion
+{
+    public StrongHealthPotion()
+        : base("Strong Health Potion", true, true, 150) { }
+}
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////
+//     Battle System
+////////////////////////////////////////
 
 class Battle
 {
@@ -115,6 +356,7 @@ class Battle
     public enum BattleState
     {
         PlayerTurn,
+        ItemMenu,
         EnemyTurn,
         Victory,
         Defeat,
@@ -184,7 +426,16 @@ class Battle
 
         else if (TurnChoice == "3")
         {
-            Console.WriteLine("Items not implemented yet");
+            state = BattleState.ItemMenu;
+            bool ItemChoiceResult = player.Bag.DisplayBagInCombat(player);
+            if (ItemChoiceResult)
+            {
+                state = BattleState.EnemyTurn;
+            }
+            else
+            {
+                state = BattleState.PlayerTurn;
+            }
         }
 
         else if (TurnChoice == "4")
@@ -210,7 +461,7 @@ class Battle
 
     private void EnemyTurn()
     {
-   
+
         int EnemyDamage = RNG.Next(1, 4);
         player.TakeDamage(EnemyDamage);
         state = BattleState.PlayerTurn;
@@ -244,6 +495,11 @@ class Battle
     }
 }
 
+
+////////////////////////////////////////
+//     Game Flow
+////////////////////////////////////////
+
 class Game
 {
 
@@ -276,6 +532,7 @@ class Game
     public enum GameState
     {
         Overworld,
+        InInventory,
         Combat,
         GameOver,
     }
@@ -291,6 +548,7 @@ class Game
         Console.WriteLine("1 - Proceed to next encounter");
         Console.WriteLine("2 - Check inventory");
         Console.WriteLine("3 - Go to town");
+        Console.WriteLine("4 - Quit");
 
         string NextActionChoice = Console.ReadLine();
 
@@ -310,17 +568,27 @@ class Game
         }
         else if (NextActionChoice == "2")
         {
-            Console.WriteLine("Coming soon");
+            gameState = GameState.InInventory;
+            Console.WriteLine($"{player.Name}: {player.CurrentHealth}/{player.MaxHealth} HP, {player.CurrentMana}/{player.MaxMana} MP");
+            Console.WriteLine();
+            player.Bag.DisplayBagInOverworld(player);
+            gameState = GameState.Overworld;
         }
         else if (NextActionChoice == "3")
         {
             Console.WriteLine("Coming soon");
+        }
+        else if (NextActionChoice == "4")
+        {
+            gameState = GameState.GameOver;
         }
 
     }
     public void Run()
     {
         player = CreatePlayerCharacter();
+        player.Bag.Add(new BasicHealthPotion(), 5);
+
         while (gameState != GameState.GameOver)
         {
             if (gameState == GameState.Overworld)
