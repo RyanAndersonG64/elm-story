@@ -7,6 +7,7 @@ public abstract class Character
     public int CurrentMana { get; protected set; }
     public int PhysicalDefense { get; protected set; }
     public int MagicDefense { get; protected set; }
+    public string StatusCondition {get; protected set;}
 
     protected Character(string CharacterName, int health, int mana, int WD, int MD)
     {
@@ -17,6 +18,7 @@ public abstract class Character
         CurrentMana = mana;
         PhysicalDefense = WD;
         MagicDefense = MD;
+        StatusCondition = "No Status";
     }
 
     public void TakeDamage(int amount)
@@ -58,20 +60,24 @@ public abstract class Character
 public abstract class PlayerCharacter : Character
 {
     public string Job { get; protected set; }
+    public int Level {get; protected set;}
     public int Strength { get; protected set; }
     public int Dexterity { get; protected set; }
     public int Intelligence { get; protected set; }
     public int Luck { get; protected set; }
+    public int CritChance { get; protected set;}
     public Inventory Bag { get; protected set; }
 
     public PlayerCharacter(string ClassType, string CharacterName, int health, int mana, int WD, int MD, int strength, int dexterity, int intelligence, int luck)
         : base(CharacterName, health, mana, WD, MD)
     {
         Job = ClassType;
+        Level = 1;
         Strength = strength;
         Dexterity = dexterity;
         Intelligence = intelligence;
         Luck = luck;
+        CritChance = (int)(Dexterity / 4 + Luck / 2);
         Bag = new Inventory();
     }
 

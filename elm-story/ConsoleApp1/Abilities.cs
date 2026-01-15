@@ -35,15 +35,33 @@ public abstract class PlayerAbility
     }
 }
 
+public class RecklessSwing : PlayerAbility
+{
+    public RecklessSwing(string name, int HCost, int MCost, string desc)
+        : base("Reckless Swing", 5, 10, "Consume 5% of your HP to deal extreme damage") { }
+
+    protected override void Apply(PlayerCharacter user, Character target)
+    {
+        if (user.CurrentHealth <= user.MaxHealth * .05)
+        {
+            user.TakeDamage(user.CurrentHealth - 1);
+        }
+        else
+        {
+            user.TakeDamage((int)(user.MaxHealth * .05));
+        }
+        target.TakeDamage(user.Strength * 2);
+    }
+}
 public class MagicBolt : PlayerAbility
 {
     private Random MagicBoltRNG = new Random();
     public MagicBolt(string name, int HCost, int MCost, string desc)
-        : base("Magic Bolt", 0, 20, "dfg") { }
+        : base("Magic Bolt", 0, 20, "Shoots a basic blast of magic energy to deal damage") { }
 
     protected override void Apply(PlayerCharacter user, Character target)
     {
-        int damage = (int)(MagicBoltRNG.Next(90, 111) * user.Intelligence / 100);
+        int damage = (int)(MagicBoltRNG.Next(90, 111) * user.Intelligence / 200);
         target.TakeDamage(user.Intelligence);
     }
 }
