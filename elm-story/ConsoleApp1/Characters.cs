@@ -113,7 +113,7 @@ public abstract class PlayerCharacter : Character
 
     public void UseBuffAbility(int index)
     {
-        if (index < 0 || index >= DamageAbilites.Count)
+        if (index < 0 || index >= BuffAbilites.Count)
         {
             throw new ArgumentOutOfRangeException("No ability corresponds to this choice");
         }
@@ -187,7 +187,7 @@ public abstract class PlayerCharacter : Character
         }
         else if (choice > 0 && choice <= DamageAbilites.Count)
         {
-            return choice;
+            return choice - 1;
         }
         else
         {
@@ -201,7 +201,7 @@ public abstract class PlayerCharacter : Character
         Console.WriteLine();
         for (int i = 0; i < BuffAbilites.Count; i++)
         {
-            Console.WriteLine($"{i + 1}: {BuffAbilites[i].Name}, health cost {BuffAbilites[i].HealthCost}, mana cost:{BuffAbilites[i].ManaCost}");
+            Console.WriteLine($"{i + 1}: {BuffAbilites[i].Name}, health cost: {BuffAbilites[i].HealthCost}, mana cost:{BuffAbilites[i].ManaCost}");
             Console.WriteLine($"    {BuffAbilites[i].Description}");
             Console.WriteLine();
         }
@@ -250,6 +250,7 @@ public abstract class PlayerCharacter : Character
 
             if (active.TurnsRemaining <= 0)
             {
+                Console.WriteLine($"{active.Buff.Name} buff has ended.");
                 active.Buff.Remove(this);
                 ActiveBuffs.RemoveAt(i);
             }

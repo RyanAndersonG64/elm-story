@@ -40,18 +40,14 @@ public class RecklessSwing : PlayerDamageAbility
 {
     private Random RecklessSwingRNG = new Random();
     public RecklessSwing()
-        : base("Reckless Swing", 5, 10, "Consume 5% of your HP to deal high damage") { }
+        : base("Reckless Swing", 0, 10, "Consume 5% of your HP to deal high damage") { }
 
     protected override void Apply(PlayerCharacter user, Character target)
     {
-        if (user.CurrentHealth <= user.MaxHealth * .05)
-        {
-            user.TakeDamage(user.CurrentHealth - 1);
-        }
-        else
-        {
-            user.TakeDamage((int)(user.MaxHealth * .05));
-        }
+        Console.WriteLine(user.CurrentHealth);
+        Console.WriteLine(user.MaxHealth * .05);
+        user.TakeDamage((int)(user.MaxHealth * .05));
+
 
         int damage = user.Strength * 2;
         if (RecklessSwingRNG.Next(1, 101) <= user.CritChance)
@@ -70,7 +66,7 @@ public class MagicBolt : PlayerDamageAbility
 {
     private Random MagicBoltRNG = new Random();
     public MagicBolt()
-        : base("Magic Bolt", 0, 20, "Shoots a basic blast of magic energy to deal damage") { }
+        : base("Magic Bolt", 0, 10, "Shoots a basic blast of magic energy to deal damage") { }
 
     protected override void Apply(PlayerCharacter user, Character target)
     {
@@ -166,11 +162,11 @@ public abstract class PlayerBuffAbility
 public class BlessRNG : PlayerBuffAbility
 {
     public BlessRNG()
-        : base("BlessRNG", 0, 10, "Increases critical chance for 5 turns") { }
+        : base("BlessRNG", 0, 10, "Increases critical chance by 30% for 5 turns") { }
 
     protected override void Apply(PlayerCharacter user)
     {
-        user.AddOrRefreshBuff(new CritChanceBuff(30, 5));
+        user.AddOrRefreshBuff(new CritChanceBuff(30, 6));
     }
 }
 

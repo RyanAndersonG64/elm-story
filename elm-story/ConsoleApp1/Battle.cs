@@ -25,7 +25,7 @@ class Battle
 
     public BattleState Run()
     {
-
+        Console.WriteLine();
         Console.WriteLine($"You encounter a {enemy.Name}!");
 
         while (state == BattleState.PlayerTurn || state == BattleState.EnemyTurn)
@@ -117,7 +117,7 @@ class Battle
                 }
                 else
                 {
-                    player.UseDamageAbility(DamageAbilityChoice - 1, enemy);
+                    player.UseDamageAbility(DamageAbilityChoice, enemy);
                     state = BattleState.EnemyTurn;
                 }
             }
@@ -130,7 +130,7 @@ class Battle
                 }
                 else
                 {
-                    player.UseBuffAbility(BuffAbilityChoice - 1);
+                    player.UseBuffAbility(BuffAbilityChoice);
                     state = BattleState.EnemyTurn;
                 }
             }
