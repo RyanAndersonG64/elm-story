@@ -1,4 +1,4 @@
-abstract class Item
+public abstract class Item
 {
     public string Name { get; protected set; }
     public bool UsableInCombat;
@@ -36,7 +36,7 @@ class ItemStack
     }
 }
 
-class Inventory
+public class Inventory
 {
     List<ItemStack> items = new List<ItemStack>();
 

@@ -1,4 +1,4 @@
-abstract class Character
+public abstract class Character
 {
     public string Name { get; protected set; }
     public int MaxHealth { get; protected set; }
@@ -55,7 +55,7 @@ abstract class Character
 //     Player Characters
 ////////////////////////////////////////
 
-abstract class PlayerCharacter : Character
+public abstract class PlayerCharacter : Character
 {
     public string Job { get; protected set; }
     public int Strength { get; protected set; }
@@ -134,45 +134,4 @@ class Slime : EnemyCharacter
 
     public Slime()
         : base("Slime", 50, 0, 1, 1, 5, 0) { }
-}
-
-
-
-
-// Abilities
-abstract class Ability
-{
-    public string Name;
-    public int HealthCost { get; protected set; }
-    public int ManaCost { get; protected set; }
-    public string Description;
-    public virtual void Use(Character user, Character target)
-    {
-        if (user.CurrentHealth <= HealthCost)
-        {
-            Console.WriteLine($"Not enough HP to use {Name}.");
-            return;
-        }
-
-        if (user.CurrentMana < ManaCost)
-        {
-            Console.WriteLine($"Not enough MP to use {Name}.");
-            return;
-        }
-
-        user.TakeDamage(HealthCost);
-        user.UseMana(ManaCost);
-
-        Apply(user, target);
-    }
-
-    protected abstract void Apply(Character user, Character target);
-
-    protected Ability(string AbilityName, int AbilityHealthCost, int AbilityManaCost, string AbilityDescription)
-    {
-        Name = AbilityName;
-        HealthCost = AbilityHealthCost;
-        ManaCost = AbilityManaCost;
-        Description = AbilityDescription;
-    }
 }
