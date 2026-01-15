@@ -207,7 +207,12 @@ class Battle
         }
         else if (state == BattleState.Victory)
         {
-            Console.WriteLine($"{enemy.Name} was defeated!");
+            Console.WriteLine($"{enemy.Name} was defeated! {player.Name} gained {enemy.ExperienceYield} experience.");
+            player.GainExperience(enemy.ExperienceYield);
+            if (player.Experience >= Math.Pow((player.Level + 1), 3))
+            {
+                player.LevelUp();
+            }
         }
         else if (state == BattleState.Fled)
         {

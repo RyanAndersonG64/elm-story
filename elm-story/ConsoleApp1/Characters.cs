@@ -61,10 +61,14 @@ public abstract class PlayerCharacter : Character
 {
     public string Job { get; protected set; }
     public int Level { get; protected set; }
+    public int Experience { get; protected set; }
+    public int StatPoints { get; protected set; }
+
     public int Strength { get; protected set; }
     public int Dexterity { get; protected set; }
     public int Intelligence { get; protected set; }
     public int Luck { get; protected set; }
+
     public int CritChance { get; protected set; }
     public int CritDamage { get; protected set; }
     public Inventory Bag { get; protected set; }
@@ -78,6 +82,8 @@ public abstract class PlayerCharacter : Character
     {
         Job = ClassType;
         Level = 1;
+        Experience = 1;
+        StatPoints = 0;
         Strength = strength;
         Dexterity = dexterity;
         Intelligence = intelligence;
@@ -85,6 +91,21 @@ public abstract class PlayerCharacter : Character
         CritChance = (int)(Dexterity / 4 + Luck / 2);
         CritDamage = critDamage;
         Bag = new Inventory();
+    }
+
+    public void GainExperience(int exp)
+    {
+        Experience += exp;
+    }
+
+    // public abstract void CheckForNewSkill();
+
+    public void LevelUp()
+    {
+        Level++;
+        Console.WriteLine($"{Name} leveled up to {Level}!");
+        StatPoints += 5;
+        // CheckForNewSkill();
     }
 
     public void LearnDamageAbility(PlayerDamageAbility Ability)
@@ -238,7 +259,9 @@ public abstract class PlayerCharacter : Character
         var active = new ActivePlayerBuff(buff);
         ActiveBuffs.Add(active);
         buff.Effect(this);
+        Console.WriteLine();
         Console.WriteLine($"{buff.Name} applied for {buff.Duration} turns!");
+        Console.WriteLine();
     }
 
     public void TickBuffs()
@@ -352,11 +375,13 @@ abstract class EnemyCharacter : Character
 {
     public int PhysicalAttack;
     public int MagicAttack;
-    protected EnemyCharacter(string CharacterName, int health, int mana, int WD, int MD, int WA, int MA)
+    public int ExperienceYield;
+    protected EnemyCharacter(string CharacterName, int health, int mana, int WD, int MD, int WA, int MA, int exp)
         : base(CharacterName, health, mana, WD, MD)
     {
         PhysicalAttack = WA;
         MagicAttack = MA;
+        ExperienceYield = exp;
     }
 }
 
@@ -364,5 +389,5 @@ class Slime : EnemyCharacter
 {
 
     public Slime()
-        : base("Slime", 50, 0, 1, 1, 5, 0) { }
+        : base("Slime", 50, 0, 1, 1, 5, 0, 1) { }
 }
