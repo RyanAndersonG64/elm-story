@@ -95,7 +95,7 @@ public class Backstab : PlayerDamageAbility
     private Random BackstabRNG = new Random();
 
     public Backstab()
-        : base("Backstab", 0, 0, "If the target is at full health, hits them with a massive attack") { }
+        : base("Backstab", 0, 0, "If the target is at full health, hits them with a massive attack that is more likely to crit") { }
 
     protected override void Apply(PlayerCharacter user, Character target)
     {
@@ -115,7 +115,7 @@ public class Backstab : PlayerDamageAbility
             int BackstabDamage = user.Attack(BackstabRNG.Next(100, 141));
             if (BackstabRNG.Next(1, 101) <= (user.CritChance + 50))
             {
-                BackstabDamage *= user.CritDamage * 2;
+                BackstabDamage *= user.CritDamage / 50;
                 Console.WriteLine("Critical Hit!");
             }
             Console.WriteLine($"{user.Name} takes {target.Name} by surprise with a backstab for {BackstabDamage} damage");

@@ -176,16 +176,16 @@ public abstract class PlayerCharacter : Character
             Console.WriteLine($"    {DamageAbilites[i].Description}");
             Console.WriteLine();
         }
-        Console.WriteLine($"{DamageAbilites.Count} - Cancel");
+        Console.WriteLine($"{DamageAbilites.Count + 1} - Cancel");
 
         int choice;
         bool Parsedchoice = int.TryParse(Console.ReadLine(), out choice);
 
-        if (choice == DamageAbilites.Count)
+        if (choice == DamageAbilites.Count + 1)
         {
             return -1;
         }
-        else if (choice > 0 && choice < DamageAbilites.Count)
+        else if (choice > 0 && choice <= DamageAbilites.Count)
         {
             return choice;
         }
@@ -205,18 +205,18 @@ public abstract class PlayerCharacter : Character
             Console.WriteLine($"    {BuffAbilites[i].Description}");
             Console.WriteLine();
         }
-        Console.WriteLine($"{BuffAbilites.Count} - Cancel");
+        Console.WriteLine($"{BuffAbilites.Count + 1} - Cancel");
 
         int choice;
         bool Parsedchoice = int.TryParse(Console.ReadLine(), out choice);
 
-        if (choice == BuffAbilites.Count)
+        if (choice == BuffAbilites.Count + 1)
         {
             return -1;
         }
-        else if (choice > 0 && choice < BuffAbilites.Count)
+        else if (choice > 0 && choice <= BuffAbilites.Count)
         {
-            return choice;
+            return choice - 1;
         }
         else
         {

@@ -117,19 +117,21 @@ class Battle
                 }
                 else
                 {
-                    player.UseDamageAbility(DamageAbilityChoice, enemy);
+                    player.UseDamageAbility(DamageAbilityChoice - 1, enemy);
+                    state = BattleState.EnemyTurn;
                 }
             }
             else if (AbilityMenuChoice == "2")
             {
-                int BuffAbilityChoice = player.DisplayDamageAbilities();
+                int BuffAbilityChoice = player.DisplayBuffAbilities();
                 if (BuffAbilityChoice == -1)
                 {
                     state = BattleState.PlayerTurn;
                 }
                 else
                 {
-                    player.UseBuffAbility(BuffAbilityChoice);
+                    player.UseBuffAbility(BuffAbilityChoice - 1);
+                    state = BattleState.EnemyTurn;
                 }
             }
             else if (AbilityMenuChoice == "3")
