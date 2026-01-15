@@ -69,6 +69,10 @@ public abstract class PlayerCharacter : Character
     public int CritDamage { get; protected set; }
     public Inventory Bag { get; protected set; }
 
+
+    public List<PlayerDamageAbility> DamageAbilites { get; } = new List<PlayerDamageAbility>();
+    public List<PlayerBuffAbility> BuffAbilites { get; } = new List<PlayerBuffAbility>();
+
     public PlayerCharacter(string ClassType, string CharacterName, int health, int mana, int WD, int MD, int strength, int dexterity, int intelligence, int luck, int critDamage)
         : base(CharacterName, health, mana, WD, MD)
     {
@@ -83,9 +87,37 @@ public abstract class PlayerCharacter : Character
         Bag = new Inventory();
     }
 
+    public void LearnDamageAbility(PlayerDamageAbility Ability)
+    {
+        DamageAbilites.Add(Ability);
+    }
+
+    public void LearnBuffAbility(PlayerBuffAbility Ability)
+    {
+        BuffAbilites.Add(Ability);
+    }
+
     public virtual int Attack(double AttackRoll)
     {
         return 5;
+    }
+
+    public void UseDamageAbility(int index, Character target)
+    {
+        if (index < 0 || index >= DamageAbilites.Count)
+        {
+            throw new ArgumentOutOfRangeException("No ability corresponds to this choice");
+        }
+        DamageAbilites[index].Use(this, target);
+    }
+
+    public void UseBuffAbility(int index)
+    {
+        if (index < 0 || index >= DamageAbilites.Count)
+        {
+            throw new ArgumentOutOfRangeException("No ability corresponds to this choice");
+        }
+        BuffAbilites[index].Use(this);
     }
 
     public void ModifyStrength(int amount)
@@ -135,6 +167,64 @@ public abstract class PlayerCharacter : Character
 
     public List<ActivePlayerBuff> ActiveBuffs { get; } = new();
 
+    public int DisplayDamageAbilities()
+    {
+        Console.WriteLine();
+        for (int i = 0; i < DamageAbilites.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}: {DamageAbilites[i].Name}, health cost {DamageAbilites[i].HealthCost}, mana cost:{DamageAbilites[i].ManaCost}");
+            Console.WriteLine($"    {DamageAbilites[i].Description}");
+            Console.WriteLine();
+        }
+        Console.WriteLine($"{DamageAbilites.Count} - Cancel");
+
+        int choice;
+        bool Parsedchoice = int.TryParse(Console.ReadLine(), out choice);
+
+        if (choice == DamageAbilites.Count)
+        {
+            return -1;
+        }
+        else if (choice > 0 && choice < DamageAbilites.Count)
+        {
+            return choice;
+        }
+        else
+        {
+            Console.WriteLine("Invalid Choice");
+            return -2;
+        }
+    }
+
+    public int DisplayBuffAbilities()
+    {
+        Console.WriteLine();
+        for (int i = 0; i < BuffAbilites.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}: {BuffAbilites[i].Name}, health cost {BuffAbilites[i].HealthCost}, mana cost:{BuffAbilites[i].ManaCost}");
+            Console.WriteLine($"    {BuffAbilites[i].Description}");
+            Console.WriteLine();
+        }
+        Console.WriteLine($"{BuffAbilites.Count} - Cancel");
+
+        int choice;
+        bool Parsedchoice = int.TryParse(Console.ReadLine(), out choice);
+
+        if (choice == BuffAbilites.Count)
+        {
+            return -1;
+        }
+        else if (choice > 0 && choice < BuffAbilites.Count)
+        {
+            return choice;
+        }
+        else
+        {
+            Console.WriteLine("Invalid Choice");
+            return -1;
+        }
+    }
+
     public void AddOrRefreshBuff(PlayerBuff buff)
     {
         var existing = ActiveBuffs.FirstOrDefault(b => b.Buff.GetType() == buff.GetType());
@@ -179,6 +269,8 @@ class Warrior : PlayerCharacter
         {
             Strength = 9000;
         }
+
+        LearnDamageAbility(new RecklessSwing());
     }
 
     public override int Attack(double AttackRoll)
@@ -197,6 +289,8 @@ class Mage : PlayerCharacter
         {
             Intelligence = 9000;
         }
+
+        LearnDamageAbility(new MagicBolt());
     }
 
     public override int Attack(double AttackRoll)
@@ -215,6 +309,8 @@ class Archer : PlayerCharacter
         {
             Dexterity = 9000;
         }
+
+        LearnBuffAbility(new BlessRNG());
     }
 
     public override int Attack(double AttackRoll)
@@ -233,6 +329,8 @@ class Rogue : PlayerCharacter
         {
             Luck = 9000;
         }
+
+        LearnDamageAbility(new Backstab());
     }
 
     public override int Attack(double AttackRoll)
