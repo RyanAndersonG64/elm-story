@@ -55,6 +55,8 @@ class Battle
 
     private void PlayerTurn()
     {
+        player.TickBuffs();
+
         Console.WriteLine();
         Console.WriteLine("Choose an action");
         Console.WriteLine("1: Attack");
@@ -68,7 +70,15 @@ class Battle
 
         if (TurnChoice == "1")
         {
-            int PlayerDamage = RNG.Next(1, 6);
+            Console.WriteLine();
+            int DamageRoll = RNG.Next(80, 121);
+            int PlayerDamage = player.Attack(DamageRoll);
+            int CritRoll = RNG.Next(1,101);
+            if (CritRoll <= player.CritChance)
+            {
+                PlayerDamage = (int)(PlayerDamage * (player.CritDamage / 100));
+                Console.WriteLine("Critical Hit!");
+            }
             enemy.TakeDamage(PlayerDamage);
             Console.WriteLine($"{player.Name} attacks for {PlayerDamage} damage.");
             state = BattleState.EnemyTurn;
