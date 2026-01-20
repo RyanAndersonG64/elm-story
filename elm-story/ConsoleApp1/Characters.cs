@@ -300,7 +300,7 @@ class Warrior : PlayerCharacter
     public override int Attack(double AttackRoll)
     {
         double Roll = AttackRoll / 200;
-        return (int)Math.Round((Strength + Dexterity * 0.25) * Roll);
+        return (int)Math.Round((Strength + Dexterity * 0.25) * Roll * (100 + Level) / 100);
     }
 }
 
