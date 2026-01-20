@@ -320,7 +320,7 @@ class Mage : PlayerCharacter
     public override int Attack(double AttackRoll)
     {
         double Roll = AttackRoll / 200;
-        return (int)Math.Round((Strength + Dexterity * 0.25) * Roll);
+        return (int)Math.Round((Strength + Dexterity * 0.25) * Roll * (100 + Level) / 100);
     }
 }
 
@@ -340,7 +340,7 @@ class Archer : PlayerCharacter
     public override int Attack(double AttackRoll)
     {
         double Roll = AttackRoll / 200;
-        return (int)Math.Round((Dexterity * 0.9 + Strength * 0.5) * Roll);
+        return (int)Math.Round((Dexterity * 0.9 + Strength * 0.5) * Roll * (100 + Level) / 100);
     }
 }
 
@@ -360,7 +360,7 @@ class Rogue : PlayerCharacter
     public override int Attack(double AttackRoll)
     {
         double Roll = AttackRoll / 200;
-        return (int)Math.Round((Luck * 0.6 + Dexterity * 0.3 + Strength * 0.1) * Roll);
+        return (int)Math.Round((Luck * 0.6 + Dexterity * 0.3 + Strength * 0.1) * Roll * (100 + Level) / 100);
     }
 }
 
