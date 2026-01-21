@@ -391,3 +391,10 @@ class Slime : EnemyCharacter
     public Slime()
         : base("Slime", 50, 0, 1, 1, 5, 0, 1) { }
 }
+
+class Crab : EnemyCharacter
+{
+
+    public Crab()
+        : base("Crab", 70, 0, 2, 1, 10, 0, 3) { }
+}
